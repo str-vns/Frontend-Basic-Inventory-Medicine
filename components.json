@@ -19,6 +19,7 @@
     "api": "@/api",
     "store": "@/api/store",
     "types": "@/types"
+    
   },
   "iconLibrary": "lucide"
 }

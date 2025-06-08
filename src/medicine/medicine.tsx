@@ -1,72 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { Payment, columns } from "./column";
-import { DataTable } from "./data-table";
+import React, { use, useEffect, useState } from "react";
+import { Medicine, columns } from "./column";
+import { DataTable } from "@shared/Table/data-table";
 import { SidebarLayout } from "@/layout";
 import { Button } from "@/components/ui/button";
-import { Syringe } from "lucide-react";
+import { Syringe, Trash } from "lucide-react";
 import { Link } from "react-router";
-import axios from "axios";
-async function getData(): Promise<Payment[]> {
-  return [
-    {
-      id: "1",
-      name: "Paracetamol",
-      date: "2023-10-01",
-      amount: 10,
-      status: "completed",
-    },
-    {
-      id: "2",
-      name: "Ibuprofen",
-      date: "2023-10-02",
-      amount: 20,
-      status: "pending",
-    },
-    {
-      id: "3",
-      name: "Aspirin",
-      date: "2023-10-03",
-      amount: 30,
-      status: "failed",
-    },
-  ];
-}
+import { useGetInventory } from "@api/Inventory/Api_Inventory";
 
-export default function medicine() {
-  const [data, setData] = useState<Payment[]>([]);
+const MedicinePage: React.FC = () => {
+  const [data, setData] = useState<Medicine[]>([]);
+  const getData = useGetInventory();
+
   useEffect(() => {
-    getData().then((data) => {
-      setData(data);
-    });
-    test().then((response) => {
-      setData(response);
-    });
+    getData.execute();
   }, []);
 
-  const test = async () => {
-    const response = await axios
-      .get("http://localhost:8000/api/v1/inventories")
-      .then((res) => {
-        const data = res.data;
-        return data
-      }).catch((err) => {
-        console.error("Error fetching data:", err)
-      });
-
-      console.log(response) 
-      return response      
+  const test = () => {
+    console.log("test");
   };
+  useEffect(() => {
+    const items = getData.data?.data;
+    if (!Array.isArray(items)) return;
 
+    const mapped = items.map((item: any) => ({
+      id: item.pk,
+      name: item.fields.medicine_name,
+      desc: item.fields.medicine_desc,
+      onActive: item.fields.onActive,
+      date: new Date(item.fields.created_at).toLocaleDateString(),
+      action: (
+        // <Link to={`/medicine/${item.pk}`}>
+        <div className="flex justify-center gap-2 ">
+       <Button className="text-black hover:text-blue-500 " onClick={() => test()}>
+          <Syringe />
+        </Button>
+         <Button className="text-black hover:text-red-500 " onClick={() => test()}>
+          <Trash  />
+        </Button>
+        </div>
+      ),
+      // </Link>
+    }));
+
+    setData(mapped);
+  }, [getData.data]);
 
   return (
-    <div className="container py-10">
+    <div className="py-10 ">
       <SidebarLayout title="Medicine">
-        <Button className="mb-2 mt-5 ml-auto w-32 h-10 text-sm mr-20 hover:bg-black hover:text-white">
+        <Button className="mb-2 mt-5 ml-auto w-32 h-10 text-sm mr-20 hover:bg-black hover:text-white border-1 border-black">
           <Link to="/medicine/create">Add Medicine</Link>
         </Button>
         <DataTable columns={columns} data={data} />
-        {/* <h1 className="text-4xl font-bold mb-5 text-center">Medicine List</h1> */}
+
       </SidebarLayout>
     </div>
   );
-}
+};
+
+export default MedicinePage;

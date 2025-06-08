@@ -1,32 +1,52 @@
-'use client'
+"use client";
 import { ColumnDef } from "@tanstack/react-table";
 
-export type Payment = {
-    id: string;
-    name: string;
-    date: string;
-    amount: number;
-    status: "pending" | "completed" | "failed";
-    actions?: React.ReactNode;
-}
+export type Medicine = {
+  id: string;
+  name: string;
+  desc: string;
+  onActive: boolean;
+  date: string;
+  action: React.ReactNode;
+};
 
-export const columns: ColumnDef<Payment>[] = [
-    {
-        accessorKey: "name",
-        header: "Name",
-    },
-    {
-        accessorKey: "date",
-        header: "Date",
-    },
-    {
-        accessorKey: "amount",
-        header: "Amount",
-    },
-    {
-        accessorKey: "status",
-        header: "Status",
-       
-    },
- 
-]
+export const columns: ColumnDef<Medicine>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+      cell: ({ row }) => (
+    <div className="max-w-[200px] truncate" title={row.getValue("name")}>
+      {row.getValue("name")}
+    </div>
+  ),
+  },
+  {
+    accessorKey: "desc",
+    header: "Description",
+      cell: ({ row }) => (
+    <div className="max-w-[200px] truncate" title={row.getValue("desc")}>
+      {row.getValue("desc")}
+    </div>
+  ),
+  },
+  {
+    accessorKey: "onActive",
+    header: "On Active",
+      cell: ({ row }) => (
+    <div className={`max-w-[200px] truncate ${row.getValue("onActive") ? "text-green-500" : "text-red-500"}`}  title={row.getValue("onActive")}>
+      {row.getValue("onActive") ? "Active" : "Inactive"}
+    </div>
+  ),
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+  },
+  {
+    accessorKey: "action",
+    header: () => <div className="flex justify-center w-full">Action</div>,
+    cell: ({ row }) => (
+      <div className="flex justify-center">{row.getValue("action")}</div>
+    ),
+  },
+];
