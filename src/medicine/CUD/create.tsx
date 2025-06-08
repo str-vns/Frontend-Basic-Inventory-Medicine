@@ -18,7 +18,7 @@ const items = [
 ]
 function Create() {
   return (
-   <div className="container py-10">
+   <div className="py-10">
       <SidebarLayout title="Create Medicine" main='Medicine'>
         <Form items={items} />
       </SidebarLayout>
