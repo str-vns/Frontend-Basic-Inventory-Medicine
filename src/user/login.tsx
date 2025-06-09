@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast, Toaster } from "sonner"
 import Navbar from "../common/navbar";
-import { useNavigation } from "react-router";
+import { showToast, ToasterContainer } from "@/shared/Sonner/toast";
 
 
-const login = () => {
-  const [click, setClick] = useState(false);
-  const [term, setTerm] = useState(false);
-  
+const Login = () => {
+  const [click, setClick] = useState<boolean>(false);
+  const [term, setTerm] = useState<boolean>(false);
+
   const handleTerm = () => {
     setTerm(!term);
   };
@@ -18,23 +17,26 @@ const login = () => {
     setClick(!click)
     if(term !== true)
     {
-        toast.warning("Check the Checkbox First",{
-            description: "Does not checked",
-            position: "top-right",
-            closeButton: true,
-            
+     
 
-            
+        showToast({
+          title: "Check the Checkbox First",
+          description: "Does not checked",
+          position: "top-right",
+          type: "error",
         })
     }
     else
   {  
-    toast.success("Successfully logged in",{
-        description: "Welcome back!",
-        duration: 2000,
-        position: "top-right",
-    })
-    navigation("/medicine")
+
+showToast({
+          title: "Successfully logged in",
+          description: "Welcome back!",
+          position: "top-right",
+          type: "success",
+        })
+
+    // navigation("/medicine")
 }
     console.log("clicked")
   }
@@ -43,7 +45,7 @@ const login = () => {
     <div>
       <Navbar />
       <div className="justify-center items-center flex h-screen mt-20">
-      <Toaster/>
+        <ToasterContainer />
         <div className="w-1/2 h-screen hidden lg:block">
           <img
             src="https://img.freepik.com/fotos-premium/imagen-fondo_910766-187.jpg?w=826"
@@ -114,4 +116,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;

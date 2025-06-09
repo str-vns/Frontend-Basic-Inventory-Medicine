@@ -13,6 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { ToasterContainer } from "@/shared/Sonner/toast";
 
 interface DataLayoutProps {
   children: React.ReactNode;
@@ -27,7 +28,6 @@ export function RootLayout({ children }: DataLayoutProps) {
       <head />
       <body>
         <main>{children}</main>
-        <Toaster />
       </body>
     </html>
   );
@@ -38,12 +38,13 @@ const keysNavigation = [
     title: "Medicine",
     navigate: "/medicine",
   },
-]
+];
 export function SidebarLayout({ title, main, children }: DataLayoutProps) {
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
+        <ToasterContainer />
         <header className="flex h-16 shrink-0 items-center gap-2 border-b -mt-10 md:w-full lg:w-full">
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
@@ -52,17 +53,17 @@ export function SidebarLayout({ title, main, children }: DataLayoutProps) {
               {main === null ? (
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      {title}
-                    </BreadcrumbLink>
+                    <BreadcrumbLink href="#">{title}</BreadcrumbLink>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               ) : (
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                  {keysNavigation.map((item) => (
-                    <BreadcrumbLink key={item.title} href={item.navigate}>{main}</BreadcrumbLink>
-                  ))}
+                    {keysNavigation.map((item) => (
+                      <BreadcrumbLink key={item.title} href={item.navigate}>
+                        {main}
+                      </BreadcrumbLink>
+                    ))}
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>

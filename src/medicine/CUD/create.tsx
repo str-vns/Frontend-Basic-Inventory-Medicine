@@ -24,10 +24,19 @@ const items = [
 ]
 
 const Create = () => {
+  const [medName, setMedName] = React.useState<string>("");
+  const [desc, setDesc] = React.useState<string>("");
+  const [imageFiles, setImageFiles] = React.useState<string[]>([]);
+
+  console.log("medName", medName);
   return (
    <div className="py-10">
       <SidebarLayout title="Create Medicine" main='Medicine'>
-        <Form items={items} image={true} />
+        <Form items={items} image={true} returnItems={(medName, desc, imageFiles) => {
+          setMedName(medName);
+          setDesc(desc);
+          setImageFiles(imageFiles);
+        }}/>
       </SidebarLayout>
     </div>
   )

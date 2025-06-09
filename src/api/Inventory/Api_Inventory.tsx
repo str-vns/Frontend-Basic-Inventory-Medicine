@@ -17,4 +17,5 @@ export const useGetInventory = create((set) => ({
       set({ ...initalInventory, loading: false, error: error });
     }
   },
+  
 }));
