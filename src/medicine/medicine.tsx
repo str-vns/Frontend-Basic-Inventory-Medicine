@@ -5,12 +5,12 @@ import { SidebarLayout } from "@/layout";
 import { Button } from "@/components/ui/button";
 import { Syringe, Trash } from "lucide-react";
 import { Link } from "react-router";
-import { useGetInventory } from "@api/Inventory/Api_Inventory";
+import { useGetMedicine } from "@api/Medicine/Api_Medicine";
 
 const MedicinePage: React.FC = () => {
   const [data, setData] = useState<Medicine[]>([]);
-  const getData = useGetInventory();
-
+  const getData = useGetMedicine();
+ 
   useEffect(() => {
     getData.execute();
   }, []);
@@ -19,15 +19,16 @@ const MedicinePage: React.FC = () => {
     console.log("test");
   };
   useEffect(() => {
-    const items = getData.data?.data;
+    const items = getData.data;
     if (!Array.isArray(items)) return;
 
     const mapped = items.map((item: any) => ({
       id: item.pk,
-      name: item.fields.medicine_name,
-      desc: item.fields.medicine_desc,
-      onActive: item.fields.onActive,
-      date: new Date(item.fields.created_at).toLocaleDateString(),
+      name: item.medicine_name,
+      desc: item.medicine_desc,
+      onActive: item.onActive,
+      image: item.images[0],
+      date: new Date(item.created_at).toLocaleDateString(),
       action: (
         // <Link to={`/medicine/${item.pk}`}>
         <div className="flex justify-center gap-2 ">
@@ -41,7 +42,6 @@ const MedicinePage: React.FC = () => {
       ),
       // </Link>
     }));
-
     setData(mapped);
   }, [getData.data]);
 

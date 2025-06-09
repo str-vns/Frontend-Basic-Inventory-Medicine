@@ -54,16 +54,16 @@ export function DataTable<TData, TValue>(
                             </TableRow >
                     ))}
                 </TableHeader>
-                <TableBody >
+                <TableBody>
                     {table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                             <TableRow key={row.id}
                                 data-state={row.getIsSelected() && "selected"}
-                                className="hover:bg-gray-100"
+                                className="hover:bg-gray-100 " 
                             >
                                 {row.getVisibleCells().map((cell) =>
                                 (
-                                  <TableCell key={cell.id}>
+                                  <TableCell key={cell.id} className="py-4 px-4">
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                   </TableCell>  
                                 ))}

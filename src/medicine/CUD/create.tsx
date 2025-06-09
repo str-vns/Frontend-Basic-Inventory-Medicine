@@ -14,13 +14,20 @@ const items = [
     placeholder: "Enter a description",
     type: "textarea",
     required: true
+  },
+  {
+    title: "Image",
+    placeholder: "Upload an image",
+    type: "file",
+    required: true
   }
 ]
-function Create() {
+
+const Create = () => {
   return (
    <div className="py-10">
       <SidebarLayout title="Create Medicine" main='Medicine'>
-        <Form items={items} />
+        <Form items={items} image={true} />
       </SidebarLayout>
     </div>
   )
