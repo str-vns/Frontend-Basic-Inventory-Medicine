@@ -18,7 +18,8 @@
     "hooks": "@/hooks",
     "api": "@/api",
     "store": "@/api/store",
-    "types": "@/types"
+    "types": "@/types",
+    "utilities": "@/utils"
     
   },
   "iconLibrary": "lucide"
