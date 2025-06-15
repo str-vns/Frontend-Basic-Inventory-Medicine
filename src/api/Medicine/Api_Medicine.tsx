@@ -25,7 +25,7 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
     try {
       // const headers = {
       //   "Content-Type": "application/json",
-      //   "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      //   "Authorization": `Token ${localStorage.getItem("token")}`,
       // }
 
       const response = await axios.get<MedicineState[]>(`${BaseURL}medicines`);
@@ -46,10 +46,10 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
     set({ loading: true, error: "", success: false });
     try {
  
-      const headers = {
-        "Content-Type": "Content-Type: multipart/form-data",
-        "Authorization": `Token 9f4e7f336f912e234a78c164d1b8ade7120d32f2`,
-      }
+      // const headers = {
+      //   "Content-Type": "application/json",
+      //   "Authorization": `Token ${localStorage.getItem("token")}`,
+      // }
       const formData = new FormData();
       formData.append("medicine_name", data.medicine_name);
       formData.append("medicine_desc", data.medicine_desc);
