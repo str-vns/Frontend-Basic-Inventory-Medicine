@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Login from './user/login'
 import Medicine from './medicine/medicine'
-import MedicineCreate from '@medicine/CUD/create'
+import MedicineCreate from '@/medicine/CUD/create'
 function App() {
 
   return (
