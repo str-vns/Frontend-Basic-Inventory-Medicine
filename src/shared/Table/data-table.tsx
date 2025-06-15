@@ -77,6 +77,7 @@ export function DataTable<TData, TValue>(
                             </TableCell>
                         </TableRow>
                     )} 
+
                 </TableBody>
             </Table>
         </div>

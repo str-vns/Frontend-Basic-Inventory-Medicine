@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ const Form: React.FC<FormProps> = ({
   const ImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target;
     if (!input.files) return;
+
     if (imageFile.length >= 5) {
       showToast({
         title: "Image limit reached",
@@ -38,8 +39,8 @@ const Form: React.FC<FormProps> = ({
     }
 
     const files = Array.from(input.files);
-
     files.forEach((file) => {
+      const reader = new FileReader();
       if (file.size > 2 * 1024 * 1024) {
         showToast({
           title: "File too large",
@@ -49,7 +50,16 @@ const Form: React.FC<FormProps> = ({
         });
         return;
       } else {
-        setImageFile((prevFiles) => [...prevFiles, URL.createObjectURL(file)]);
+        reader.onload = () => {
+          if (reader.result) {
+            setImageFile((prevFiles) => [
+              ...prevFiles,
+              reader.result as string,
+            ]);
+          }
+        };
+        reader.readAsDataURL(file);
+
         showToast({
           title: "Image added successfully",
           description: "You can add more images if needed.",
@@ -60,9 +70,18 @@ const Form: React.FC<FormProps> = ({
     });
   };
 
+  console.log("Image files:", imageFile);
   const removeImg = (index: number) => {
     setImageFile((prevFiles) => {
-      
+      if (prevFiles.length === 1) {
+        showToast({
+          title: "Last image removed",
+          description: "You have removed the last image.",
+          position: "top-right",
+          type: "info",
+        });
+        return [];
+      }
       return prevFiles.filter((_, i) => i !== index);
     });
     showToast({
@@ -74,10 +93,20 @@ const Form: React.FC<FormProps> = ({
   };
 
   const handleSubmit = () => {
-    if (returnItems) {
-      returnItems(medName, desc, imageFile);
-    }
-  };
+  if (!medName.trim() || !desc.trim() || imageFile.length === 0) {
+    showToast({
+      title: "Missing fields",
+      description: "Please fill all fields and upload at least one image.",
+      position: "top-right",
+      type: "error",
+    });
+    return;
+  }
+  if (returnItems) {
+    returnItems(medName, desc, imageFile);
+  }
+};
+
   return (
     <div className="flex flex-col items-center justify-center p-5">
       <text className="font-bold text-2xl"> Medicine </text>
