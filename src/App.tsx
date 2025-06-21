@@ -3,6 +3,7 @@ import './App.css'
 import Login from './user/login'
 import Medicine from './medicine/medicine'
 import MedicineCreate from '@/medicine/CUD/create'
+import MedicineUpdate from '@/medicine/CUD/update'
 function App() {
 
   return (
@@ -12,6 +13,7 @@ function App() {
           <Route path="/" element={<Login/>} />
           <Route path="/medicine" element={<Medicine/>} />
           <Route path='/medicine/create' element={<MedicineCreate/>} />
+          <Route path='/medicine/update/:id' element={<MedicineUpdate/>} />
         </Routes>
       </div>
     </Router>
