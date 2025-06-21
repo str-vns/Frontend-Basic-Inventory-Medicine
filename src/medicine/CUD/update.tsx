@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Form from "@shared/form";
 import { SidebarLayout } from "@/layout";
 import { useParams } from "react-router-dom";
@@ -59,7 +59,7 @@ const Update = () => {
 
       fetchData();
     }
-  }, []);
+  }, [getSingleData, id]);
 
   const handleSubmit = async (
     medName: string,
