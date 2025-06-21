@@ -1,9 +1,9 @@
-import React from "react";
 import Form from "@shared/form";
 import { SidebarLayout } from "@/layout";
 import { useGetMedicine } from "@/api/Medicine/Api_Medicine";
 import { MedicineItem } from "@/types/medicine";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "@/shared/Sonner/toast";
 const items = [
   {
     title: "Medicine Name",
@@ -27,25 +27,32 @@ const items = [
 
 const Create = () => {
   const addCreate = useGetMedicine((state) => state.addCreate);
-  const { success } = useGetMedicine();
+  const { loading } = useGetMedicine();
   const navigate = useNavigate();
 
-  const handleSubmit = async (medName: string, desc: string, imageFiles: string[]) => {
+  const handleSubmit = async (
+    medName: string,
+    desc: string,
+    imageFiles: string[]
+  ) => {
     if (!medName || !desc || imageFiles.length === 0) return;
     const newItem: MedicineItem = {
       medicine_name: medName,
       medicine_desc: desc,
       images: imageFiles,
     };
-    await addCreate(newItem);
-  };
-
-  // Only navigate after successful creation
-  React.useEffect(() => {
-    if (success) {
+    const result = await addCreate(newItem);
+    console.log("Create result:", result);
+    if (result) {
       navigate("/medicine");
+      showToast({
+        title: "Medicine created successfully",
+        description: "The medicine has been added to the list.",
+        position: "top-right",
+        type: "success",
+      });
     }
-  }, [success, navigate]);
+  };
 
   return (
     <div className="py-10">
@@ -53,7 +60,12 @@ const Create = () => {
         <Form
           items={items}
           image={true}
-          returnItems={async (medName, desc, imageFiles) => {
+          isLoading={loading}
+          returnItems={async (
+            medName: string,
+            desc: string,
+            imageFiles: string[]
+          ) => {
             if (!medName || !desc || imageFiles.length === 0) return;
             handleSubmit(medName, desc, imageFiles);
           }}

@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { showToast } from "@/shared/Sonner/toast";
+import { useGetMedicine } from "@/api/Medicine/Api_Medicine";
+
 interface FormProps {
   items: {
     title: string;
     placeholder: string;
     type: string;
     required: boolean;
+    isEdit?: boolean;
   }[];
+
+  singleItem?: {
+    medicine_name: string;
+    medicine_desc: string;
+    images: string[];
+    img_id: string[];
+  };
   image?: boolean;
+  isEdit?: boolean;
+  isLoading?: boolean;
   returnItems?: (medName: string, desc: string, imageFiles: string[]) => void;
 }
 
@@ -19,10 +31,15 @@ const Form: React.FC<FormProps> = ({
   items,
   image,
   returnItems,
+  singleItem,
+  isLoading = false,
+  isEdit = false,
 }: FormProps) => {
+  const delImg = useGetMedicine((state) => state.delImg);
   const [imageFile, setImageFile] = useState<string[]>([]);
-  const [medName, setMedName] = useState<string>("");
-  const [desc, setDesc] = useState<string>("");
+  const [medName, setMedName] = useState<string>('');
+  const [desc, setDesc] = useState<string>('');
+  const [imgId, setImgId] = useState<string[]>([]);
 
   const ImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target;
@@ -70,7 +87,6 @@ const Form: React.FC<FormProps> = ({
     });
   };
 
-  console.log("Image files:", imageFile);
   const removeImg = (index: number) => {
     setImageFile((prevFiles) => {
       if (prevFiles.length === 1) {
@@ -84,6 +100,13 @@ const Form: React.FC<FormProps> = ({
       }
       return prevFiles.filter((_, i) => i !== index);
     });
+
+    if (imgId.length > 0) {
+      if (delImg) {
+        delImg(imgId[index]);
+      }
+      setImgId((prevIds) => prevIds.filter((_, i) => i !== index));
+    }
     showToast({
       title: "Image removed",
       description: "The image has been removed successfully.",
@@ -93,36 +116,53 @@ const Form: React.FC<FormProps> = ({
   };
 
   const handleSubmit = () => {
-  if (!medName.trim() || !desc.trim() || imageFile.length === 0) {
-    showToast({
-      title: "Missing fields",
-      description: "Please fill all fields and upload at least one image.",
-      position: "top-right",
-      type: "error",
-    });
-    return;
-  }
-  if (returnItems) {
-    returnItems(medName, desc, imageFile);
-  }
-};
+    if (!medName.trim() || !desc.trim() || imageFile.length === 0) {
+      showToast({
+        title: "Missing fields",
+        description: "Please fill all fields and upload at least one image.",
+        position: "top-right",
+        type: "error",
+      });
+      return;
+    }
+    if (returnItems) {
+      returnItems(medName, desc, imageFile);
+    }
+  };
+
+  useEffect(() => {
+    console.log("isEdit", singleItem);
+    if (isEdit && singleItem) {
+      console.log("run");
+      setMedName(singleItem.medicine_name);
+      setDesc(singleItem.medicine_desc);
+      setImageFile(singleItem.images);
+      setImgId(singleItem.img_id ? singleItem.img_id : []);
+
+    } else {
+      return;
+    }
+  }, [singleItem, isEdit]);
 
   return (
     <div className="flex flex-col items-center justify-center p-5">
-      <text className="font-bold text-2xl"> Medicine </text>
+      <h1 className="font-bold text-2xl"> Medicine </h1>
       {items.map((item) => (
         <div key={item.title} className="p-3 w-1/4 mt-1">
-          <text className="text-sm">{item.title} </text>
+          <h1 className="text-sm">{item.title} </h1>
           {item.type === "text" && (
             <Input
               placeholder={item.placeholder}
+              value={medName} 
               onChange={(e) => setMedName(e.target.value)}
+
             />
           )}
           {item.type === "textarea" && (
             <Textarea
               placeholder={item.placeholder}
               className="mb-4 h-full border-1 border-black w-full"
+              value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
           )}
@@ -165,6 +205,7 @@ const Form: React.FC<FormProps> = ({
       <Button
         className="w-1/5 h-10 mt-10 text-sm bg-black text-white hover:bg-gray-800"
         onClick={handleSubmit}
+        disabled={isLoading}
       >
         Submit
       </Button>
