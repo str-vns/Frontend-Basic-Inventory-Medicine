@@ -17,21 +17,22 @@ interface DataTableProps<TData, TValue>
 {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+
     
 }
 
-export function DataTable<TData, TValue>(
+export function DataTable<TData, TValue, >(
     {
         columns,
         data,
-    } : DataTableProps<TData, TValue> )
+    }: DataTableProps<TData, TValue>)
     {
         const table = useReactTable({
                 data, 
                 columns, 
                 getCoreRowModel: getCoreRowModel()
             })
-    console.log("data2", data);
+
     return (
         <div className="rounded-md border mt-5 mx-20   ">
             <Table >

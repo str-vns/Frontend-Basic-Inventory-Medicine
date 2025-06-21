@@ -1,37 +1,46 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Syringe, Trash } from "lucide-react";
+import { ImagesState } from "@/types/medicine";
+import { Link } from "react-router-dom";
 
 export type Medicine = {
   id?: string;
-  images: string;
+  images: ImagesState[];
   medicine_name: string;
   medicine_desc: string;
   onActive: boolean;
   created_at: string;
-  action: React.ReactNode;
+  action: string;
 };
 
-export const columns: ColumnDef<Medicine>[] = [
+export const getMedicineColumns = (
+  delMed: (id: string) => void,
+): ColumnDef<Medicine>[] => [
   {
     accessorKey: "images",
     header: "Image",
-    cell: ({ row }) => (
-      console.log(row.getValue("images")),
-      (
-        <div
-          className="max-w-[40px] max-h-[40px] truncate"
-          title={row.getValue("images")}
-        >
-          <img src={row.getValue("images")} alt={row.getValue("medicine_name")} />
+    cell: ({ row }) => {
+      const images = row.getValue("images");
+      const firstImageUrl =
+        Array.isArray(images) && images.length > 0 ? images[0]?.url : "";
+      const altName =
+        Array.isArray(images) && images.length > 0
+          ? images[0]?.original_name
+          : "No Image";
+      return (
+        <div className="max-w-[40px] max-h-[40px] truncate" title={firstImageUrl}>
+          <img src={firstImageUrl} alt={altName} />
         </div>
-      )
-    ),
+      );
+    },
   },
   {
     accessorKey: "medicine_name",
     header: "Name",
     cell: ({ row }) => (
-      <div className=" truncate" title={row.getValue("medicine_name")}>
+      <div className="truncate" title={row.getValue("medicine_name")}>
         {row.getValue("medicine_name")}
       </div>
     ),
@@ -40,7 +49,7 @@ export const columns: ColumnDef<Medicine>[] = [
     accessorKey: "medicine_desc",
     header: "Description",
     cell: ({ row }) => (
-      <div className=" truncate" title={row.getValue("medicine_desc")}>
+      <div className="truncate" title={row.getValue("medicine_desc")}>
         {row.getValue("medicine_desc")}
       </div>
     ),
@@ -61,13 +70,38 @@ export const columns: ColumnDef<Medicine>[] = [
   },
   {
     accessorKey: "created_at",
-    header: () => <div className="flex justify-center w-full">Date</div>,
+    header: () => <div className="w-full text-center font-semibold">Date</div>,
+    cell: ({ row }) => {
+      const value = row.getValue("created_at");
+      const date = new Date(value as string);
+      const formatted = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      return <div className="text-center">{formatted}</div>;
+    },
   },
   {
     accessorKey: "action",
     header: () => <div className="flex justify-center w-full">Action</div>,
-    cell: ({ row }) => (
-      <div className="flex justify-center">{row.getValue("action")}</div>
-    ),
+    cell: ({ row }) => {
+      const id = row.original.id;
+      return (
+        <div className="flex justify-center gap-2">
+          <Button className="text-black hover:text-blue-500 cursor-pointer">
+            <Link to={`/medicine/update/${id}`}>
+              <Syringe />
+            </Link>
+          </Button>
+          <Button
+            className="text-black hover:text-red-500 cursor-pointer"
+            onClick={async () => delMed(id as string)}
+          >
+            <Trash />
+          </Button>
+        </div>
+      );
+    },
   },
 ];
