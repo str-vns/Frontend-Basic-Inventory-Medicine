@@ -12,7 +12,7 @@ export interface MedicineState {
   onActive: boolean;
   images: ImagesState[];
   created_at: string;
-  action: React.ReactNode;
+  action: string;
 }
 
 export interface ImagesState {
