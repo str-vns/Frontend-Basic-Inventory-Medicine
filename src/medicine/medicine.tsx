@@ -17,7 +17,11 @@ type MedicineTableRow = {
   action: string;
 };
 
-const MedicinePage: React.FC = () => {
+interface MedicinePageProps {
+  isInventory?: boolean;
+}
+
+const MedicinePage: React.FC<MedicinePageProps> = ({ isInventory }) => {
   const [datas, setData] = useState<MedicineTableRow[]>([]);
   const delMed = useGetMedicine((state) => state.delMed);
   const getData = useGetMedicine((state) => state.getData);
@@ -28,7 +32,7 @@ const MedicinePage: React.FC = () => {
     setData(data);
   };
 
-  const columns = getMedicineColumns(
+const columns = getMedicineColumns(
   async (id: string) => {
     if (delMed) {
       await delMed(id);      
@@ -48,6 +52,7 @@ const MedicinePage: React.FC = () => {
       });
     }
   },
+  isInventory,
 );
 
   useEffect(() => {
@@ -64,14 +69,17 @@ const MedicinePage: React.FC = () => {
 
   return (
     <div className="py-10">
-      <SidebarLayout title="Medicine">
-        <Button
+      <SidebarLayout title={isInventory ? "Inventory" : "Medicine"}>
+        { !isInventory && (
+         <Button
           type="button"
           asChild
           className="mb-2 mt-5 ml-auto w-32 h-10 text-sm mr-20 hover:bg-black hover:text-white border border-black"
         >
           <Link to="/medicine/create">Add Medicine</Link>
         </Button>
+        )}
+
         <DataTable columns={columns} data={datas} />
       </SidebarLayout>
     </div>
