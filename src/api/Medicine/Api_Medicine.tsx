@@ -58,10 +58,11 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   addCreate: async (data: MedicineItem) => {
     set({ loading: true, error: "", success: false });
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        "Authorization": `Token b688bdb8c13b6ce8d78fe272f42afc40671196d6`,
-      }
+        // const headers = {
+      //   "Content-Type": "multipart/form-data",
+      //   "Authorization": `Token ${localStorage.getItem("token")}`,
+      // }
+      
       const formData = new FormData();
       formData.append("medicine_name", data.medicine_name);
       formData.append("medicine_desc", data.medicine_desc);
@@ -69,7 +70,9 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       const response = await axios.post<MedicineState>(
         `${BaseURL}medicine`,
         formData,
-        { headers }
+        { 
+          // headers
+         }
       );
 
       const med_id = response.data.id;
