@@ -17,7 +17,6 @@ interface MedicineStore {
   getSingleData?: (id: string) => Promise<MedicineState | void>;
   delImg?: (imgId: string) => Promise<void>;
   delMed?: (id: string) => Promise<void>;
-  
 }
 
 export const useGetMedicine = create<MedicineStore>((set) => ({
@@ -62,7 +61,6 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       //   "Content-Type": "multipart/form-data",
       //   "Authorization": `Token ${localStorage.getItem("token")}`,
       // }
-      
       const formData = new FormData();
       formData.append("medicine_name", data.medicine_name);
       formData.append("medicine_desc", data.medicine_desc);
@@ -98,11 +96,10 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
         throw new Error("Medicine ID is undefined or null");
       }
 
-      await axios.post(`${BaseURL}MultiUpload`, multiUploadData, { 
+      await axios.post(`${BaseURL}MultiUpload`, multiUploadData, {
         // headers
       });
       return response.data;
-
     } catch (error) {
       devError(`Error creating medicine: ${error}`);
       set({ error: error instanceof Error ? error.message : "unknown error" });
@@ -185,15 +182,15 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
         throw new Error("Medicine ID is undefined or null");
       }
       console.log("MultiUpload Data:", multiUploadData);
-        await axios.post(`${BaseURL}MultiUpload`, multiUploadData, { 
+      await axios.post(`${BaseURL}MultiUpload`, multiUploadData, {
         // headers
-       });
+      });
 
-       return response.data;
+      return response.data;
     } catch (error) {
       devError(`Error updating medicine: ${error}`);
       set({ error: error instanceof Error ? error.message : "unknown error" });
-    } 
+    }
   },
 
   delImg: async (imgId: string) => {
@@ -204,7 +201,7 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       //   "Authorization": `Token ${localStorage.getItem("token")}`,
       // }
 
-       await axios.delete(`${BaseURL}delMultiImage/${imgId}?path=medicine`, {
+      await axios.delete(`${BaseURL}delMultiImage/${imgId}?path=medicine`, {
         // headers,
       });
 
@@ -218,21 +215,24 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   },
 
   delMed: async (id: string) => {
-    set({loading: true, error: "", success: false});
+    set({ loading: true, error: "", success: false });
     try {
       // const headers = {
       //   "Content-Type": "application/json",
       //   "Authorization": `Token ${localStorage.getItem("token")}`,
       // }
-      await axios.delete(`${BaseURL}medicine/delete/${id}`,{ 
+      await axios.delete(`${BaseURL}medicine/delete/${id}`, {
         // headers
-       })
+      });
 
-      set({loading: false, success: true});
-  
+      set({ loading: false, success: true });
     } catch (error) {
       devError(`Error deleting medicine: ${error}`);
-      set({ error: error instanceof Error ? error.message : "unknown error", success: false, loading: false  });
+      set({
+        error: error instanceof Error ? error.message : "unknown error",
+        success: false,
+        loading: false,
+      });
     }
-  }
+  },
 }));
