@@ -62,7 +62,7 @@ const InventoryView = () => {
         </div>
  
         <div className="flex align-center justify-center mt-5">
-          <CarouselThings invData={data?.inventories} />
+          <CarouselThings invData={data?.inventories} currentPageTitle={"📦 Inventory"} />
         </div>
       </SidebarLayout>
     </div>

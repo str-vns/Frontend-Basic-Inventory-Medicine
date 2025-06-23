@@ -14,23 +14,24 @@ import { ModalAnalog } from "@/shared/Modal/index";
 
 interface CarouselThingsProps {
   invData?: InventoryData[];
+  currentPageTitle?: string;
 }
 
-const CarouselThings: React.FC<CarouselThingsProps> = ({ invData }) => {
+const CarouselThings: React.FC<CarouselThingsProps> = ({ invData, currentPageTitle }) => {
   const expDate: Date | undefined =
     invData && invData.length > 0
       ? new Date(invData.map((item) => item.expiration_date)[0])
       : undefined;
   const [modalOpen, setModalOpen] = React.useState(false);
   const dateExpired: string = expDate?.toDateString() || "N/A";
- console.log("modalOpen", modalOpen);
+
   return (
     <div>
       <Carousel className="w-full max-w-xs ">
         <CarouselContent>
           <CarouselItem>
             <div className="p-1">
-                <Card className="flex flex-col h-full justify-center items-center cursor-pointer hover:shadow-lg transition">
+                <Card className="flex flex-col h-full justify-center items-center cursor-pointer hover:shadow-lg transition"  onClick={() => setModalOpen(true)}>
                   <Button
                     className="text-black hover:text-green-500 cursor-pointer mb-4"
                     size="icon"
@@ -104,7 +105,7 @@ const CarouselThings: React.FC<CarouselThingsProps> = ({ invData }) => {
         <CarouselNext className="hover:bg-black hover:text-white" />
       </Carousel>
       {modalOpen && (
-        <ModalAnalog onOpenChange={setModalOpen} isModalOpen={modalOpen} />
+        <ModalAnalog onOpenChange={setModalOpen} isModalOpen={modalOpen} titles={currentPageTitle}/>
       )}
     </div>
   );

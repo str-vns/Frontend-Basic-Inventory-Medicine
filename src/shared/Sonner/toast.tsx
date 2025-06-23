@@ -11,15 +11,30 @@ interface ToasterProps {
 }
 
 export function showToast({ title, description, duration, type, position, closeButton }: ToasterProps): void {
-    toast[type || "default"](
-        title,
-        {
-            description: description || "",
-            duration: duration || 3000,
-            position: position || "top-right",
-            closeButton: closeButton || false,
-        }
-    );
+    const toastOptions = {
+        description: description || "",
+        duration: duration || 3000,
+        position: position || "top-right",
+        closeButton: closeButton || false,
+    };
+
+    switch (type) {
+        case "success":
+            toast.success(title, toastOptions);
+            break;
+        case "error":
+            toast.error(title, toastOptions);
+            break;
+        case "warning":
+            toast.warning(title, toastOptions);
+            break;
+        case "info":
+            toast.info(title, toastOptions);
+            break;
+        default:
+            toast(title, toastOptions);
+            break;
+    }
 }
 
 export function ToasterContainer() {
