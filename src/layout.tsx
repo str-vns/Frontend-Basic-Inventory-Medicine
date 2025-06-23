@@ -35,6 +35,7 @@ export function RootLayout({ children }: DataLayoutProps) {
 
 
 export function SidebarLayout({ title, main, children }: DataLayoutProps) {
+ 
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -51,7 +52,10 @@ export function SidebarLayout({ title, main, children }: DataLayoutProps) {
                 {main ? (
                   <>
                     <BreadcrumbItem className="hidden md:block">
+                    { main === "Inventory" ? (
+                      <BreadcrumbLink href="/inventory">{main}</BreadcrumbLink>) : (
                       <BreadcrumbLink href="/medicine">{main}</BreadcrumbLink>
+                    )}
                     </BreadcrumbItem>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>

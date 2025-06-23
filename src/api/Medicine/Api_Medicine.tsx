@@ -57,7 +57,7 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   addCreate: async (data: MedicineItem) => {
     set({ loading: true, error: "", success: false });
     try {
-      // const headers = {
+        // const headers = {
       //   "Content-Type": "multipart/form-data",
       //   "Authorization": `Token ${localStorage.getItem("token")}`,
       // }
@@ -68,7 +68,9 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       const response = await axios.post<MedicineState>(
         `${BaseURL}medicine`,
         formData,
-        { headers }
+        { 
+          // headers
+         }
       );
 
       const med_id = response.data.id;

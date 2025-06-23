@@ -1,7 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Syringe, Trash } from "lucide-react";
+import { Syringe, Trash, EyeIcon } from "lucide-react";
 import { ImagesState } from "@/types/medicine";
 import { Link } from "react-router-dom";
 
@@ -17,6 +17,7 @@ export type Medicine = {
 
 export const getMedicineColumns = (
   delMed: (id: string) => void,
+  isInventory?: boolean
 ): ColumnDef<Medicine>[] => [
   {
     accessorKey: "images",
@@ -30,7 +31,10 @@ export const getMedicineColumns = (
           ? images[0]?.original_name
           : "No Image";
       return (
-        <div className="max-w-[40px] max-h-[40px] truncate" title={firstImageUrl}>
+        <div
+          className="max-w-[40px] max-h-[40px] truncate"
+          title={firstImageUrl}
+        >
           <img src={firstImageUrl} alt={altName} />
         </div>
       );
@@ -49,7 +53,10 @@ export const getMedicineColumns = (
     accessorKey: "medicine_desc",
     header: "Description",
     cell: ({ row }) => (
-      <div className="truncate" title={row.getValue("medicine_desc")}>
+      <div
+        className="max-w-[200px] truncate overflow-hidden text-ellipsis"
+        title={row.getValue("medicine_desc")}
+      >
         {row.getValue("medicine_desc")}
       </div>
     ),
@@ -89,17 +96,31 @@ export const getMedicineColumns = (
       const id = row.original.id;
       return (
         <div className="flex justify-center gap-2">
-          <Button className="text-black hover:text-blue-500 cursor-pointer">
-            <Link to={`/medicine/update/${id}`}>
-              <Syringe />
-            </Link>
-          </Button>
-          <Button
-            className="text-black hover:text-red-500 cursor-pointer"
-            onClick={async () => delMed(id as string)}
-          >
-            <Trash />
-          </Button>
+          {isInventory ? (
+            <div>
+              <Button className="text-black hover:text-yellow-500 cursor-pointer">
+                <Link to={`/inventory/view/${id}`}>
+                  <p className="flex items-center gap-1 ">
+                    <EyeIcon /> View
+                  </p>
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <Button className="text-black hover:text-blue-500 cursor-pointer">
+                <Link to={`/medicine/update/${id}`}>
+                  <Syringe />
+                </Link>
+              </Button>
+              <Button
+                className="text-black hover:text-red-500 cursor-pointer"
+                onClick={async () => delMed(id as string)}
+              >
+                <Trash />
+              </Button>
+            </div>
+          )}
         </div>
       );
     },
