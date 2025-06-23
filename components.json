@@ -20,7 +20,8 @@
     "store": "@/api/store",
     "types": "@/types",
     "utilities": "@/utils",
-    "inventory": "@/inventory"
+    "inventory": "@/inventory",
+    "data": "@/data"
     
   },
   "iconLibrary": "lucide"
