@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input";
 import { CalendarFold, X } from "lucide-react";
 import CalendarComponent from "../Calendar/index";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DropDown } from "../DropDown/index";
 import { itemsList } from "@/data/medData";
 import { showToast } from "../Sonner/toast";
 import { devWarn } from "@/utils/generalHelpers";
 import { AlertDialogAction } from "@radix-ui/react-alert-dialog";
+import { InventoryData } from "@/types/inventory";
+import { useGetInventory } from "@/api/Inventory/Api_Inventory";
 
 interface ModalAnalogProps {
   onOpenChange?: (open: boolean) => void;
@@ -23,12 +25,19 @@ interface ModalAnalogProps {
   item?: undefined | null;
   isEdit?: boolean;
   titles?: string;
+  medicineId?: string;
+  editData?: InventoryData;
+  refreshSingle?: () => void;
 }
 
 export const ModalAnalog: React.FC<ModalAnalogProps> = ({
   onOpenChange,
   isModalOpen,
   titles,
+  medicineId,
+  isEdit,
+  editData,
+  refreshSingle,
 }) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
@@ -39,6 +48,22 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
   const [price, setPrice] = useState<number>(1);
   const [quantity, setQuantity] = useState<number>(1);
   const [manufacturer, setManufacturer] = useState<string>("");
+  const addInventory = useGetInventory((state) => state.addInventory);
+  const updateInventory = useGetInventory((state) => state.updateInventory);
+
+  useEffect(() => {
+    if (isEdit && editData) {
+      setPrice(Number(editData.medicine_price));
+      setQuantity(Number(editData.quantity));
+      setManufacturer(editData.manufacturer);
+      setSelectType(editData.medicine_type);
+      const measurementParts = editData.medicine_measurement.split(" ");
+      setSelectValueMeasurement(Number(measurementParts[0]));
+      setSelectMeasurement(measurementParts[1]);
+      const expirationDate = new Date(editData.expiration_date);
+      setDate(expirationDate);
+    }
+  }, [isEdit, editData]);
 
   const handleItem = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -60,7 +85,7 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
     }
   };
 
-  const handleCreate = () => {
+  const handleCreate = async (id: string) => {
     if (
       !manufacturer ||
       !price ||
@@ -92,14 +117,18 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
         type: "warning",
       });
       return;
-    } else if ( manufacturer.length < 3) {
+    } else if (manufacturer.length < 3) {
       devWarn("Manufacturer name must be at least 3 characters long");
       showToast({
         title: "Manufacturer name must be at least 3 characters long",
         description: "Please enter a valid manufacturer name.",
         type: "warning",
       });
-    } else if (price !== Number(price) || quantity !== Number(quantity)|| selectValueMeasurement !== Number(selectValueMeasurement)) {
+    } else if (
+      price !== Number(price) ||
+      quantity !== Number(quantity) ||
+      selectValueMeasurement !== Number(selectValueMeasurement)
+    ) {
       devWarn("Price and quantity must be valid numbers");
       showToast({
         title: "Price and quantity must be valid numbers",
@@ -109,17 +138,29 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
       return;
     }
 
-    const itemData = {
-      price: price,
-      quantity: quantity,
+    const itemData: InventoryData = {
+      medicine_price: price.toString(),
+      quantity: quantity.toString(),
       manufacturer: manufacturer,
-      type: selectType,
-      measurement: selectValueMeasurement + " " + selectMeasurement,
-      date: date ? date.toLocaleDateString() : "",
+      medicine_type: selectType,
+      medicine_measurement: selectValueMeasurement + " " + selectMeasurement,
+      expiration_date: date
+        ? `${date?.getFullYear()}-${date?.getMonth() + 1}-${date?.getDate()}`
+        : "",
+      medicine_id: medicineId || "",
     };
 
-    console.log("Item Data:", itemData);
+    if (updateInventory && isEdit) {
+      await updateInventory(id || "", itemData);
+      onOpenChange?.(false);
+      refreshSingle?.();
+    } else if (addInventory) {
+      await addInventory(itemData);
+      onOpenChange?.(false);
+      refreshSingle?.();
+    }
   };
+
   return (
     <div>
       <AlertDialog open={isModalOpen} onOpenChange={onOpenChange}>
@@ -153,6 +194,15 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
                     min={item.type === "text" ? undefined : 1}
                     step={item.type === "text" ? undefined : 1}
                     onChange={(e) => handleItem(e, item.title)}
+                    value={
+                      item.title === "Price"
+                        ? price.toString()
+                        : item.title === "Quantity"
+                        ? quantity.toString()
+                        : item.title === "Manufacturer"
+                        ? manufacturer
+                        : ""
+                    }
                   />
                 </div>
               )}
@@ -170,6 +220,11 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
                         max={1000}
                         min={1}
                         step={1}
+                        value={
+                          item.title === "Medicine Measurement"
+                            ? selectValueMeasurement
+                            : ""
+                        }
                         onChange={(e) =>
                           setSelectValueMeasurement(Number(e.target.value))
                         }
@@ -179,6 +234,8 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
                       isType={item.title}
                       selectType={(data) => setSelectType(data)}
                       selectMeasurement={(data) => setSelectMeasurement(data)}
+                      setTypes={selectType}
+                      setMesurement={selectMeasurement}
                     />
                   </div>
                 </div>
@@ -209,6 +266,7 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
                     <CalendarComponent
                       selectedDate={(data: string) => setDate(new Date(data))}
                       isClosed={(closed: boolean) => setIsCalendarOpen(!closed)}
+                      isDate={date}
                     />
                   )}
                 </div>
@@ -217,7 +275,12 @@ export const ModalAnalog: React.FC<ModalAnalogProps> = ({
           ))}
 
           <AlertDialogFooter className="p-3 ">
-            <Button className={'w-full hover:text-green-600 border-none text-md'} onClick={handleCreate}>Continue</Button>
+            <Button
+              className={"w-full hover:text-green-600 border-none text-md"}
+              onClick={() => handleCreate(editData?.id || "")}
+            >
+              Continue
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

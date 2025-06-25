@@ -1,14 +1,19 @@
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface CalendarProps {
   selectedDate?: (data: string) => void;
   isClosed?: (closed: boolean) => void;
+  isDate?: Date;
 }
 
-const CalendarComponent: React.FC<CalendarProps> = ({ selectedDate, isClosed }) => {
+const CalendarComponent: React.FC<CalendarProps> = ({ selectedDate, isClosed, isDate }) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  console.log("Selected date:", date);
+  useEffect(() => {
+    if (isDate) {
+      setDate(isDate);
+    }
+  }, [isDate]);
   return (
     <div className="flex flex-col mt-5 items-center justify-center  rounded-lg shadow-lg">
           <Calendar

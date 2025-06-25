@@ -8,20 +8,27 @@ import {
   DropdownMenuRadioItem
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { medType, medMeasurement } from "@/data/medData";
 
 interface DropDownProps {
   isType: string;
   selectType?: (data: string) => void;
   selectMeasurement?: (data: string) => void;
+  setTypes?: string;
+  setMesurement?: string;
 }
 
-export const DropDown: React.FC<DropDownProps> = ({ selectType, selectMeasurement, isType }) => {
+export const DropDown: React.FC<DropDownProps> = ({ selectType, selectMeasurement, isType, setTypes, setMesurement }) => {
     const itemList = isType === "Medicine Type" ? medType : medMeasurement;
     const [selectedType, setSelectedType] = useState("");
     const [selectedMeasurement, setSelectedMeasurement] = useState("");
     const [isOpen, setIsOpen] = useState(false);
+  
+    useEffect(() => {
+      setSelectedType(setTypes ?? "");
+      setSelectedMeasurement(setMesurement ?? "");
+    }, [setTypes, setMesurement])
     return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="mt-2">
@@ -35,7 +42,7 @@ export const DropDown: React.FC<DropDownProps> = ({ selectType, selectMeasuremen
         <DropdownMenuLabel>{isType}</DropdownMenuLabel>
         <DropdownMenuSeparator className="border-b"/>
         <DropdownMenuRadioGroup
-          value={isType === 'Medicine Type' ? selectedType : selectedMeasurement}
+          value={isType === 'Medicine Type' ? selectedType : selectedMeasurement }
           onValueChange={(value) => {
             if (isType === 'Medicine Type') {
               setSelectedType(value);
