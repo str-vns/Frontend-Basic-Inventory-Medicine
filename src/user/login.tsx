@@ -2,44 +2,53 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import Navbar from "../common/navbar";
+import { useNavigate } from "react-router-dom";
 import { showToast, ToasterContainer } from "@/shared/Sonner/toast";
-
+import { useUserStore } from "@/api/user/Api_user";
 
 const Login = () => {
   const [click, setClick] = useState<boolean>(false);
   const [term, setTerm] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const login = useUserStore((state) => state.login);
+  const { success } = useUserStore((state) => state);
+  const navigation = useNavigate();
 
   const handleTerm = () => {
     setTerm(!term);
   };
 
-  const handleClick = () =>{
-    setClick(!click)
-    if(term !== true)
-    {
-     
+  const handleClick = async () => {
+    setClick(!click);
+    if (term !== true) {
+      showToast({
+        title: "Check the Checkbox First",
+        description: "Does not checked",
+        position: "top-right",
+        type: "error",
+      });
+    } else {
+      const data = {
+        email: email,
+        password: password,
+      };
+      console.log(data);
+      await login(data);
 
+      if (success) {
         showToast({
-          title: "Check the Checkbox First",
-          description: "Does not checked",
-          position: "top-right",
-          type: "error",
-        })
-    }
-    else
-  {  
-
-showToast({
-          title: "Successfully logged in",
+          title: "Login Successful",
           description: "Welcome back!",
           position: "top-right",
           type: "success",
-        })
+        });
+        navigation("/medicine");
+      }
+    }
 
-    // navigation("/medicine")
-}
-    console.log("clicked")
-  }
+    console.log("clicked");
+  };
 
   return (
     <div>
@@ -64,6 +73,8 @@ showToast({
               className="w-full border border-gray-300 rounded-xl py-4 px-4 focus:outline-none focus:border-blue-500"
               placeholder="Enter your email"
               autoComplete="off"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
             />
           </div>
           <div className="mb-5">
@@ -74,6 +85,8 @@ showToast({
               type="password"
               className="w-full border border-gray-300 rounded-xl py-4 px-4 focus:outline-none focus:border-blue-500"
               placeholder="Enter your password "
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
               autoComplete="off"
             />
           </div>
@@ -104,14 +117,13 @@ showToast({
               Login{" "}
             </Button>
           </div>
-          <div className="flex items-center justify-between mb-5 justify-center">
+          {/* <div className="flex items-center justify-between mb-5 justify-center">
             <label className="text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 hover:underline hover:underline-offset-2">
               Sign Up
             </label>
-          </div>
+          </div> */}
         </div>
       </div>
-
     </div>
   );
 };
