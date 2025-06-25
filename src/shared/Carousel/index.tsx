@@ -11,46 +11,67 @@ import { InventoryData } from "@/types/inventory";
 import { Button } from "@/components/ui/button";
 import { Plus, Syringe, Trash } from "lucide-react";
 import { ModalAnalog } from "@/shared/Modal/index";
+import { useGetInventory } from "@/api/Inventory/Api_Inventory";
 
 interface CarouselThingsProps {
   invData?: InventoryData[];
   currentPageTitle?: string;
+  med_id?: string;
+  onRefresh?: () => void;
+  returnInvData?: (data: InventoryData) => void;
 }
 
-const CarouselThings: React.FC<CarouselThingsProps> = ({ invData, currentPageTitle }) => {
-  const expDate: Date | undefined =
-    invData && invData.length > 0
-      ? new Date(invData.map((item) => item.expiration_date)[0])
-      : undefined;
+const CarouselThings: React.FC<CarouselThingsProps> = ({
+  invData,
+  currentPageTitle,
+  onRefresh,
+  med_id,
+}) => {
   const [modalOpen, setModalOpen] = React.useState(false);
-  const dateExpired: string = expDate?.toDateString() || "N/A";
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editData, setEditData] = React.useState<InventoryData | undefined>(undefined);
+  const deleteInventory = useGetInventory((state) => state.deleteInventory);
 
+  const handleEdit = (id?: string) => {
+    setIsEditing(true);
+    setModalOpen(true);
+    setEditData(invData?.find((item) => item.id === id));
+  };
+ 
+  const handleCreate = () => {
+    setIsEditing(false);
+    setModalOpen(true);
+    setEditData(undefined);
+  }
+
+  const handleDelete = async(id?: string) => {
+    if(id && deleteInventory){
+      await deleteInventory(id);
+      if(onRefresh) {
+        onRefresh();
+      }
+    }
+  }
   return (
     <div>
       <Carousel className="w-full max-w-xs ">
         <CarouselContent>
           <CarouselItem>
-            <div className="p-1">
-                <Card className="flex flex-col h-full justify-center items-center cursor-pointer hover:shadow-lg transition"  onClick={() => setModalOpen(true)}>
-                  <Button
-                    className="text-black hover:text-green-500 cursor-pointer mb-4"
-                    size="icon"
-                    asChild
-                    onClick={() => setModalOpen(true)}
-                  >
-                    <span>
-                      <Plus className="w-12 h-12" />
-                    </span>
-                  </Button>
-                  <span className="font-semibold mt-2">
-                    Create New Inventory
+            <div className="p-1 ">
+              <Card
+                className="flex flex-col mt-1 py-6 h-full justify-center items-center cursor-pointer hover:shadow-lg transition px-19"
+                onClick={() => handleCreate()}
+              >
+                  <span>
+                    <Plus className="w-8 h-8" />
                   </span>
-                </Card>
+                <span className="font-semibold mt-[25px]">Create New Inventory</span>
+              </Card>
             </div>
           </CarouselItem>
 
           {invData?.map((item, index) => (
-            <CarouselItem key={index} className="w-full ">
+            <CarouselItem key={index} className="w-full " >
               <div className="p-1">
                 <Card className="flex flex-col h-full">
                   <div className="flex items-end justify-between w-full gap-2 -mt-5 pr-5 border-b">
@@ -67,10 +88,16 @@ const CarouselThings: React.FC<CarouselThingsProps> = ({ invData, currentPageTit
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button className="text-black hover:text-blue-500 cursor-pointer">
+                      <Button className="text-black hover:text-blue-500 cursor-pointer"
+                      onClick={() => {handleEdit(
+                         item.id,
+                      )}}
+                      >
                         <Syringe />
                       </Button>
-                      <Button className="text-black hover:text-red-500 cursor-pointer">
+                      <Button className="text-black hover:text-red-500 cursor-pointer" 
+                      onClick={() => {handleDelete(item.id)}}
+                      >
                         <Trash />
                       </Button>
                     </div>
@@ -81,9 +108,7 @@ const CarouselThings: React.FC<CarouselThingsProps> = ({ invData, currentPageTit
                     </span>
                     <span className="text-[12px]">
                       Price:{" "}
-                      {item.medicine_price
-                        ? `$${item.medicine_price.toFixed(2)}`
-                        : "N/A"}
+                      {item.medicine_price ? `$${item.medicine_price}` : "N/A"}
                     </span>
                     <span className="text-[12px]">
                       Quantity: {item.quantity ? `${item.quantity} pcs` : "N/A"}
@@ -93,7 +118,7 @@ const CarouselThings: React.FC<CarouselThingsProps> = ({ invData, currentPageTit
                       {item.manufacturer ? item.manufacturer : "N/A"}
                     </span>
                     <span className="text-[12px]">
-                      Expiration Date: {dateExpired ? dateExpired : "N/A"}
+                      Expiration Date: {item.expiration_date ? (new Date(item.expiration_date).toDateString()) : "N/A"}
                     </span>
                   </CardContent>
                 </Card>
@@ -105,7 +130,15 @@ const CarouselThings: React.FC<CarouselThingsProps> = ({ invData, currentPageTit
         <CarouselNext className="hover:bg-black hover:text-white" />
       </Carousel>
       {modalOpen && (
-        <ModalAnalog onOpenChange={setModalOpen} isModalOpen={modalOpen} titles={currentPageTitle}/>
+        <ModalAnalog
+          onOpenChange={setModalOpen}
+          isModalOpen={modalOpen}
+          titles={currentPageTitle}
+          medicineId={med_id}
+          isEdit={isEditing}
+          editData={isEditing ? editData : undefined}
+          refreshSingle={onRefresh}
+        />
       )}
     </div>
   );

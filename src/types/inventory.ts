@@ -8,14 +8,16 @@ export const initalInventory = {
 
 export interface InventoryData {
    id?: string;
+   medicine_id: string;
    medicine_measurement: string;
    medicine_type: string;
-   quantity: number;
-   medicine_price: number;
+   quantity: string;
+   medicine_price: string;
    manufacturer: string;
    expiration_date: string;
    onActive?: boolean;
 }
+
 export type InventoryState = {
     medicine_id?: string;
     medicine_name: string;

@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { useGetMedicine } from "@/api/Medicine/Api_Medicine";
 import { ImagesState } from "@/types/medicine";
 import { showToast } from "@/shared/Sonner/toast";
+import { usePersistUser } from "@/api/user/Api_user";
+
 type MedicineTableRow = {
   id?: string;
   images: ImagesState[];
@@ -26,7 +28,9 @@ const MedicinePage: React.FC<MedicinePageProps> = ({ isInventory }) => {
   const delMed = useGetMedicine((state) => state.delMed);
   const getData = useGetMedicine((state) => state.getData);
   const hasFetchedRef = useRef(false);
-
+  const saveUser = usePersistUser((state) => state.users);
+  
+  console.log("user", saveUser);
   const onRefresh = async () => {
     const data = await getData();
     setData(data);

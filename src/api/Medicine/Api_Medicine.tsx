@@ -4,6 +4,7 @@ import { BaseURL } from "@assets/base/index";
 import { MedicineState, MedicineItem } from "@/types/medicine";
 import { File64base } from "@/utils/File64Base";
 import { devError } from "@/utils/generalHelpers";
+import { usePersistUser } from "@/api/user/Api_user";
 
 interface MedicineStore {
   medicines: MedicineState[];
@@ -27,10 +28,15 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   success: false,
 
   getData: async () => {
+    const token = usePersistUser.getState().token.user_Token;
     try {
       set({ loading: true, error: "", success: false });
 
-      const response = await axios.get<MedicineState[]>(`${BaseURL}medicines`);
+      const response = await axios.get<MedicineState[]>(`${BaseURL}medicines`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
 
       const medicines = response.data ?? [];
 
@@ -55,12 +61,13 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   },
 
   addCreate: async (data: MedicineItem) => {
+    const token = usePersistUser.getState().token.user_Token;
     set({ loading: true, error: "", success: false });
     try {
-        // const headers = {
-      //   "Content-Type": "multipart/form-data",
-      //   "Authorization": `Token ${localStorage.getItem("token")}`,
-      // }
+      const headers = {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Token ${token}`,
+      };
       const formData = new FormData();
       formData.append("medicine_name", data.medicine_name);
       formData.append("medicine_desc", data.medicine_desc);
@@ -68,9 +75,9 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       const response = await axios.post<MedicineState>(
         `${BaseURL}medicine`,
         formData,
-        { 
-          // headers
-         }
+        {
+          headers,
+        }
       );
 
       const med_id = response.data.id;
@@ -97,7 +104,7 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       }
 
       await axios.post(`${BaseURL}MultiUpload`, multiUploadData, {
-        // headers
+        headers,
       });
       return response.data;
     } catch (error) {
@@ -142,12 +149,13 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   },
 
   updateMed: async (id: string, data: MedicineItem) => {
+    const token = usePersistUser.getState().token.user_Token;
     set({ loading: true, error: "", success: false });
     try {
-      // const headers = {
-      //   "Content-Type": "multipart/form-data",
-      //   "Authorization": `Token ${localStorage.getItem("token")}`,
-      // }
+      const headers = {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Token ${token}`,
+      };
 
       const formData = new FormData();
       formData.append("medicine_name", data.medicine_name);
@@ -156,7 +164,7 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
         `${BaseURL}medicine/patch/${id}`,
         formData,
         {
-          // headers
+          headers,
         }
       );
 
@@ -194,15 +202,16 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   },
 
   delImg: async (imgId: string) => {
+    const token = usePersistUser.getState().token.user_Token;
     set({ loading: true, error: "", success: false });
     try {
-      // const headers = {
-      //   "Content-Type": "application/json",
-      //   "Authorization": `Token ${localStorage.getItem("token")}`,
-      // }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      };
 
       await axios.delete(`${BaseURL}delMultiImage/${imgId}?path=medicine`, {
-        // headers,
+        headers,
       });
 
       set({ loading: false, success: true });
@@ -215,14 +224,15 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
   },
 
   delMed: async (id: string) => {
+    const token = usePersistUser.getState().token.user_Token;
     set({ loading: true, error: "", success: false });
     try {
-      // const headers = {
-      //   "Content-Type": "application/json",
-      //   "Authorization": `Token ${localStorage.getItem("token")}`,
-      // }
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      };
       await axios.delete(`${BaseURL}medicine/delete/${id}`, {
-        // headers
+        headers,
       });
 
       set({ loading: false, success: true });
@@ -235,4 +245,5 @@ export const useGetMedicine = create<MedicineStore>((set) => ({
       });
     }
   },
+  
 }));
