@@ -3,13 +3,13 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { config } from 'dotenv'
-import scrollbarHide from 'tailwind-scrollbar-hide'
 // Load environment variables from .env file
 config()
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), scrollbarHide()],
+  plugins: [react(), tailwindcss()
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
